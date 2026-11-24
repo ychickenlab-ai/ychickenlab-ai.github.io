@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ヤンニョムチキン研究所</title>
+<meta name="description" content="サクサク衣に、とろ〜り甘辛。やみつきの甘辛ヤンニョムチキンが自慢の専門店。都城LAB・宮崎駅前店の2店舗。Webで当日のテイクアウト注文ができます。">
+<link rel="icon" href="https://mine0829.github.io/chickenlab-lp/images/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Shippori+Mincho+B1:wght@600;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#F4EADB;
+    --cream-deep:#E2D3C0;
+    --ink:#2A1C18;
+    --ink-soft:#6E5E55;
+    --wine:#AE1112;
+    --wine-deep:#7E0B0C;
+    --red:#AE1112;
+    --gold:#AE1112;
+    --gold-soft:#FFE45C;
+    --yellow:#FFE45C;
+    --white:#FFFFFF;
+  }
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;}
+  body{margin:0;background:var(--cream);font-family:'Zen Kaku Gothic New','Hiragino Sans',sans-serif;font-weight:400;color:var(--ink);overflow-x:hidden;}
+  h1,h2,h3,.head-font{font-family:'Shippori Mincho B1','Hiragino Mincho ProN',serif;font-weight:700;}
+  .en-font{font-family:'Playfair Display',Georgia,serif;font-weight:900;}
+  a{color:inherit;text-decoration:none;}
+  a:hover{opacity:0.82;}
+  img{display:block;max-width:100%;}
+  [id]{scroll-margin-top:68px;}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:14px 26px;border-radius:999px;font-weight:700;font-size:14px;letter-spacing:0.06em;border:2px solid transparent;transition:transform .15s ease, opacity .15s ease;white-space:nowrap;}
+  .btn:hover{transform:translateY(-1px);opacity:1;}
+  .btn-outline{background:transparent;color:var(--white);border-color:rgba(255,255,255,0.75);}
+  .btn-outline:hover{background:rgba(255,255,255,0.08);}
+  .btn-yellow{background:var(--yellow);color:var(--wine-deep);border-color:var(--yellow);box-shadow:0 5px 0 #C9A51E;font-weight:900;}
+  .section-label{display:inline-block;font-family:'Playfair Display',Georgia,serif;font-weight:900;font-size:24px;letter-spacing:0.02em;color:var(--red);margin:0 0 4px 0;line-height:1;}
+  .card{background:var(--white);border-radius:18px;overflow:hidden;border:1px solid var(--cream-deep);}
+
+  .nav{position:sticky;top:0;z-index:50;width:100%;background:rgba(126,11,12,0.96);backdrop-filter:blur(6px);}
+  .nav-inner{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;}
+  .nav-links{display:none;align-items:center;gap:28px;}
+  .nav-links a{color:var(--cream);font-size:14px;font-weight:500;}
+  .brand-name{display:none;color:var(--white);font-size:18px;font-weight:600;letter-spacing:0.04em;}
+
+  .hero{position:relative;width:100%;min-height:74vh;overflow:hidden;display:flex;align-items:flex-end;}
+  .hero-inner{position:relative;z-index:2;padding:0 20px 40px;display:flex;flex-direction:column;gap:16px;max-width:900px;}
+  .hero-title{margin:0;color:var(--white);font-size:clamp(28px, 7.5vw, 52px);line-height:1.45;}
+  .hero-actions{display:flex;flex-direction:column;gap:12px;margin-top:4px;}
+  .hero-actions .btn{width:100%;}
+
+  .section-pad{padding:56px 20px;}
+  .concept{display:flex;flex-direction:column;gap:36px;}
+  .concept-images{display:flex;gap:12px;order:-1;}
+  .concept-images img{width:50%;height:220px;object-fit:cover;border-radius:18px;}
+  .stat-row{display:flex;gap:36px;margin-top:10px;padding-top:20px;border-top:1px solid var(--cream-deep);}
+  .stat-num{font-size:24px;font-weight:600;color:var(--wine);}
+  .stat-label{font-size:12px;color:var(--ink-soft);letter-spacing:0.05em;}
+
+  .taste-grid{display:grid;grid-template-columns:repeat(2, minmax(0,1fr));gap:1px;background:var(--cream-deep);border:1px solid var(--cream-deep);border-radius:18px;overflow:hidden;}
+  .taste-cell{background:var(--white);padding:24px 18px;display:flex;flex-direction:column;gap:12px;}
+  .taste-line{width:26px;height:1px;background:var(--gold);}
+  .taste-name{font-size:15px;font-weight:600;}
+  .taste-desc{font-size:12.5px;color:var(--ink-soft);line-height:1.8;font-weight:300;}
+
+  .menu-head{display:flex;flex-direction:column;gap:16px;margin-bottom:8px;}
+  .menu-grid{display:grid;grid-template-columns:1fr;gap:20px;}
+  .menu-card{display:flex;flex-direction:column;border-color:rgba(243,238,227,0.14);}
+  .menu-card img{width:100%;height:180px;object-fit:cover;}
+  .menu-card-body{flex:1 1 auto;padding:20px;display:flex;flex-direction:column;gap:8px;background:var(--ink);}
+  .badge{align-self:flex-start;background:var(--yellow);color:var(--ink);font-size:11px;font-weight:900;letter-spacing:0.06em;padding:3px 10px;border-radius:999px;}
+  .menu-name{font-size:17px;font-weight:600;color:var(--white);}
+  .menu-desc{font-size:12.5px;color:rgba(243,238,227,0.62);line-height:1.7;font-weight:300;}
+  .menu-price{margin-top:4px;font-size:24px;color:var(--yellow);}
+  .menu-btn{margin-top:auto;padding:11px 20px;font-size:13px;box-shadow:none;}
+  .menu-foot{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;}
+
+  .shop-grid{display:grid;grid-template-columns:1fr;gap:1px;background:var(--cream-deep);border:1px solid var(--cream-deep);border-radius:18px;overflow:hidden;}
+  .shop-cell{background:var(--white);padding:30px 26px;display:flex;flex-direction:column;gap:16px;}
+  .shop-row{display:flex;gap:12px;align-items:flex-start;}
+  .shop-row svg{margin-top:3px;flex-shrink:0;}
+  .shop-row span{font-size:13.5px;line-height:1.8;color:var(--ink-soft);font-weight:300;}
+  .shop-note{font-size:12px;color:var(--wine);font-weight:500;letter-spacing:0.05em;padding-top:10px;border-top:1px solid var(--cream-deep);}
+
+  .cta{display:flex;flex-direction:column;gap:28px;}
+  .cta-actions{display:flex;flex-direction:column;gap:12px;}
+  .cta-actions .btn{width:100%;}
+
+  .footer-inner{padding:32px 20px;display:flex;flex-direction:column;gap:18px;}
+  .footer-links{display:flex;gap:22px;flex-wrap:wrap;}
+  .footer-links a{color:rgba(245,239,224,0.7);font-size:12.5px;}
+
+  @media (min-width:640px){
+    .concept{flex-direction:row;gap:56px;align-items:center;}
+    .concept-images{order:0;}
+    .concept-images img{height:340px;}
+    .menu-grid{grid-template-columns:repeat(2, minmax(0,1fr));gap:24px;}
+    .shop-grid{grid-template-columns:repeat(2, minmax(0,1fr));}
+    .hero-actions{flex-direction:row;}
+    .hero-actions .btn{width:auto;}
+    .cta{flex-direction:row;align-items:center;justify-content:space-between;}
+    .cta-actions{flex-direction:row;flex-wrap:wrap;}
+    .cta-actions .btn{width:auto;}
+    .footer-inner{flex-direction:row;align-items:center;justify-content:space-between;padding:40px 32px;}
+  }
+  @media (min-width:820px){
+    .section-pad{padding:110px 48px;}
+    .nav-inner{padding:14px 48px;}
+    .nav-links{display:flex;}
+    .brand-name{display:inline;}
+    .taste-grid{grid-template-columns:repeat(4, minmax(0,1fr));}
+    .menu-grid{grid-template-columns:repeat(3, minmax(0,1fr));gap:28px;}
+    .hero{min-height:82vh;}
+    .hero-inner{padding:0 48px 76px;gap:22px;}
+    .footer-inner{padding:40px 48px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<div class="nav">
+  <div class="nav-inner">
+    <a href="#top" style="display: flex; align-items: center; gap: 12px;">
+      <img src="https://mine0829.github.io/chickenlab-lp/images/logo.png" alt="ヤンニョムチキン研究所 ロゴ" style="width: 40px; height: 40px; object-fit: contain; border-radius: 50%; background: var(--cream);">
+      <span class="head-font brand-name">ヤンニョムチキン研究所</span>
+    </a>
+    <div class="nav-links">
+      <a href="#concept">こだわり</a>
+      <a href="#menu">メニュー</a>
+      <a href="#shop">店舗情報</a>
+    </div>
+    <a href="https://claude.ai/artifact/ESbNTV29PapToa6jmKFQay" target="_blank" rel="noopener" class="btn btn-yellow" style="padding: 9px 18px; font-size: 13px; box-shadow: none;">テイクアウト注文</a>
+  </div>
+</div>
+
+<!-- HERO -->
+<div id="top" class="hero">
+  <img src="https://mine0829.github.io/chickenlab-lp/images/hero-takeout.webp" alt="ヤンニョムチキンのテイクアウトボックスとドリンク" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;">
+  <div style="position: absolute; inset: 0; background: linear-gradient(0deg, rgba(126,11,12,0.97) 0%, rgba(174,17,18,0.88) 42%, rgba(174,17,18,0.25) 78%, rgba(126,11,12,0.35) 100%);"></div>
+  <div class="hero-inner">
+    <div style="line-height: 0.86; color: var(--yellow);"><span style="display: block; font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-weight: 700; font-size: clamp(40px, 10vw, 84px);">Delicious</span><span style="display: block; font-family: 'Anton', Impact, sans-serif; font-size: clamp(66px, 17vw, 150px); letter-spacing: 0.01em; transform: skew(-8deg); transform-origin: left bottom;">CHICKEN</span></div>
+    <h1 class="head-font hero-title">サクサク衣に、とろ〜り甘辛。<br>頬張るたびに、幸せ広がる。</h1>
+    <p style="margin: 0; color: rgba(255,255,255,0.8); font-size: 15px; line-height: 1.9; max-width: 560px; font-weight: 300;">やみつきになる甘辛ヤンニョムチキンが自慢の専門店。韓国ドリンクやアルコール、大人気のチーズボールも揃えて、プチ韓国旅行気分をお届けします。</p>
+    <div class="hero-actions">
+      <a href="https://claude.ai/artifact/ESbNTV29PapToa6jmKFQay" target="_blank" rel="noopener" class="btn btn-yellow">テイクアウトを注文する</a>
+      <a href="#menu" class="btn btn-outline">メニューを見る</a>
+      <a href="#line" class="btn btn-outline">LINEで友だち追加</a>
+    </div>
+  </div>
+</div>
+
+<!-- CONCEPT -->
+<div id="concept" class="section-pad">
+  <div class="concept">
+    <div style="flex: 1 1 0; display: flex; flex-direction: column; gap: 18px;">
+      <span class="section-label">CONCEPT</span>
+      <h2 class="head-font" style="margin: 0; font-size: clamp(26px, 5vw, 36px); font-weight: 600; line-height: 1.5;">今日も、<br>美味しさの研究中。</h2>
+      <p style="margin: 0; font-size: 14px; line-height: 2; color: var(--ink-soft); font-weight: 300;">ヤンニョムチキン研究所は、甘口・辛口・チーズ・ガーリック…毎日ソースと向き合いながら、理想の一皿を追いかけているチキン専門店です。成分にこだわり抜いた自家製ソースは、試作と改良の繰り返しから生まれました。食べ方は自由です。フォークでも、手づかみでも、指先まで味わい尽くすのも、きっと美味しい研究のひとつ。</p>
+      <div class="stat-row">
+        <div>
+          <div class="head-font stat-num">4</div>
+          <div class="stat-label">選べるテイスト</div>
+        </div>
+        <div>
+          <div class="head-font stat-num">2</div>
+          <div class="stat-label">都城LAB / 宮崎駅前店</div>
+        </div>
+      </div>
+    </div>
+    <div class="concept-images" style="flex: 1 1 0;">
+      <img src="https://mine0829.github.io/chickenlab-lp/images/plate.webp" alt="ヤンニョムチキンとチュモッパの盛り合わせプレート">
+      <img src="https://mine0829.github.io/chickenlab-lp/images/cheeseball.webp" alt="チーズボール">
+    </div>
+  </div>
+</div>
+
+<!-- TASTE -->
+<div class="section-pad" style="padding-top: 8px; display: flex; flex-direction: column; gap: 32px;">
+  <div style="text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+    <span class="section-label">TASTE</span>
+    <h2 class="head-font" style="margin: 0; font-size: clamp(22px, 4.5vw, 30px); font-weight: 600;">テイストは1〜3種類選べます</h2>
+  </div>
+  <div class="taste-grid">
+    <div class="taste-cell">
+      <div class="taste-line"></div>
+      <div class="head-font taste-name">ヤンニョムソース(甘・辛)</div>
+      <div class="taste-desc">甘口はやさしいコク、辛口はやみつきの刺激。定番の看板テイスト。</div>
+    </div>
+    <div class="taste-cell">
+      <div class="taste-line"></div>
+      <div class="head-font taste-name">ハニーバターチーズ</div>
+      <div class="taste-desc">濃厚なチーズとはちみつの甘さがとろける、お子さまにも人気の味。</div>
+    </div>
+    <div class="taste-cell">
+      <div class="taste-line"></div>
+      <div class="head-font taste-name">ガーリック山椒</div>
+      <div class="taste-desc">ハニーガーリックの香ばしさに、山椒のキリッとした後味をプラス。</div>
+    </div>
+    <div class="taste-cell">
+      <div class="taste-line"></div>
+      <div class="head-font taste-name">マスタード</div>
+      <div class="taste-desc">ハニーマスタードの酸味と甘みで、さっぱり食べられる大人の一皿。</div>
+    </div>
+  </div>
+</div>
+
+<!-- MENU -->
+<div id="menu" class="section-pad" style="background: var(--ink); display: flex; flex-direction: column; gap: 36px;">
+  <div class="menu-head">
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      <span class="section-label">MENU</span>
+      <h2 class="head-font" style="margin: 0; color: var(--white); font-size: clamp(24px, 5vw, 32px); font-weight: 600;">人気メニューをちょっとだけ</h2>
+    </div>
+    <p style="margin: 0; color: rgba(243,238,227,0.7); font-size: 13px; font-weight: 400;">※価格はすべて税込です。テイクアウトの全メニューは、Webの注文ページでご覧いただけます。</p>
+    <a href="https://claude.ai/artifact/ESbNTV29PapToa6jmKFQay" target="_blank" rel="noopener" class="btn btn-yellow" style="align-self: flex-start;">テイクアウトを注文する</a>
+  </div>
+  <div class="menu-grid">
+    <div class="card menu-card">
+      <img src="https://mine0829.github.io/chickenlab-lp/images/plate.webp" alt="LABスペシャルセット">
+      <div class="menu-card-body">
+        <span class="badge">おすすめ</span>
+        <div class="head-font menu-name">LABスペシャルセット</div>
+        <div class="menu-desc">チュモッパ・ドリンク・えびせん付き。テイストから1〜3種選べます。</div>
+        <div class="en-font menu-price">1,200円</div>
+      </div>
+    </div>
+    <div class="card menu-card">
+      <img src="https://mine0829.github.io/chickenlab-lp/images/partyset.webp" alt="パーティセット(12ピース)">
+      <div class="menu-card-body">
+        <span class="badge">店内限定</span>
+        <div class="head-font menu-name">パーティセット(12ピース)</div>
+        <div class="menu-desc">店内限定。みんなでシェアするならこれ。テイストは最大2種まで。</div>
+        <div class="en-font menu-price">2,000円</div>
+      </div>
+    </div>
+    <div class="card menu-card">
+      <img src="https://mine0829.github.io/chickenlab-lp/images/hero-takeout.webp" alt="テイクアウト チキン">
+      <div class="menu-card-body">
+        <div class="head-font menu-name">テイクアウト チキン</div>
+        <div class="menu-desc">4・8・12ピースの3サイズ。まとめ買いほどお得に。Webで当日のテイクアウト注文ができます。</div>
+        <div class="en-font menu-price">800円〜</div>
+        <a href="https://claude.ai/artifact/ESbNTV29PapToa6jmKFQay" target="_blank" rel="noopener" class="btn btn-yellow menu-btn">テイクアウトで注文</a>
+      </div>
+    </div>
+    <div class="card menu-card">
+      <img src="https://mine0829.github.io/chickenlab-lp/images/korean3.jpg" alt="韓国チキン4種">
+      <div class="menu-card-body">
+        <div class="head-font menu-name">韓国チキン4種</div>
+        <div class="menu-desc">チキン4ピース。テイストから1〜3種選べる盛り合わせプレート。</div>
+        <div class="en-font menu-price">900円</div>
+        <a href="https://claude.ai/artifact/ESbNTV29PapToa6jmKFQay" target="_blank" rel="noopener" class="btn btn-yellow menu-btn">テイクアウトで注文</a>
+      </div>
+    </div>
+    <div class="card menu-card">
+      <img src="https://mine0829.github.io/chickenlab-lp/images/chumoppa.jpg" alt="チュモッパ">
+      <div class="menu-card-body">
+        <div class="head-font menu-name">チュモッパ</div>
+        <div class="menu-desc">ごま入りのごはんに、韓国のりとたくあん。100g・150gからお好みで。</div>
+        <div class="en-font menu-price">300円〜</div>
+        <a href="https://claude.ai/artifact/ESbNTV29PapToa6jmKFQay" target="_blank" rel="noopener" class="btn btn-yellow menu-btn">テイクアウトで注文</a>
+      </div>
+    </div>
+    <div class="card menu-card">
+      <img src="https://mine0829.github.io/chickenlab-lp/images/cheeseball.webp" alt="チーズボール">
+      <div class="menu-card-body">
+        <div class="head-font menu-name">チーズボール</div>
+        <div class="menu-desc">ご注文後、揚げたてをご用意する3個入りサイド。</div>
+        <div class="en-font menu-price">500円</div>
+        <a href="https://claude.ai/artifact/ESbNTV29PapToa6jmKFQay" target="_blank" rel="noopener" class="btn btn-yellow menu-btn">テイクアウトで注文</a>
+      </div>
+    </div>
+  </div>
+  <div class="menu-foot">
+    <p style="margin: 0; color: rgba(243,238,227,0.75); font-size: 13px;">チキン・唐揚げ・サイド・ドリンク、ぜんぶWebで当日のテイクアウト注文ができます。</p>
+    <a href="https://claude.ai/artifact/ESbNTV29PapToa6jmKFQay" target="_blank" rel="noopener" class="btn btn-yellow" style="padding: 16px 34px; font-size: 15px;">テイクアウトを注文する</a>
+  </div>
+</div>
+
+<!-- SHOP INFO -->
+<div id="shop" class="section-pad" style="display: flex; flex-direction: column; gap: 36px;">
+  <div style="text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+    <span class="section-label">SHOP</span>
+    <h2 class="head-font" style="margin: 0; font-size: clamp(22px, 4.5vw, 30px); font-weight: 600;">店舗情報</h2>
+  </div>
+  <div class="shop-grid">
+    <div class="shop-cell">
+      <div class="head-font" style="font-size: 19px; font-weight: 600;">ヤンニョムチキン研究所 都城LAB</div>
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <div class="shop-row">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 21s7-7.2 7-12a7 7 0 10-14 0c0 4.8 7 12 7 12z" stroke="#A6812E" stroke-width="1.5"/><circle cx="12" cy="9" r="2.4" stroke="#A6812E" stroke-width="1.5"/></svg>
+          <span>宮崎県都城市牟田町18-2 ボーンクラッシュビル2F</span>
+        </div>
+        <div class="shop-row">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.5" stroke="#A6812E" stroke-width="1.5"/><path d="M12 7.5V12l3 2" stroke="#A6812E" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <span>11:00〜15:00／定休日 火曜日</span>
+        </div>
+      </div>
+      <div class="shop-note">イートイン / テイクアウト（Web注文あり）</div>
+    </div>
+    <div class="shop-cell">
+      <div class="head-font" style="font-size: 19px; font-weight: 600;">ヤンニョムチキン研究所 宮崎駅前店</div>
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <div class="shop-row">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 21s7-7.2 7-12a7 7 0 10-14 0c0 4.8 7 12 7 12z" stroke="#A6812E" stroke-width="1.5"/><circle cx="12" cy="9" r="2.4" stroke="#A6812E" stroke-width="1.5"/></svg>
+          <span>宮崎駅前「チキン南蛮78」の店内</span>
+        </div>
+        <div class="shop-row">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.5" stroke="#A6812E" stroke-width="1.5"/><path d="M12 7.5V12l3 2" stroke="#A6812E" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <span>営業時間・定休日はチキン南蛮78に準じます</span>
+        </div>
+      </div>
+      <div class="shop-note">イートイン / テイクアウト</div>
+    </div>
+  </div>
+</div>
+
+<!-- LINE CTA -->
+<div id="line" class="section-pad cta" style="background: var(--wine-deep);">
+  <div style="display: flex; flex-direction: column; gap: 14px; max-width: 620px;">
+    <span class="section-label" style="color: var(--gold-soft);">FOLLOW &amp; ORDER</span>
+    <h2 class="head-font" style="margin: 0; color: var(--white); font-size: clamp(22px, 4.5vw, 30px); font-weight: 600;">友だち追加で、いつでも注文・予約</h2>
+    <p style="margin: 0; color: rgba(243,238,227,0.75); font-size: 13.5px; line-height: 1.9; font-weight: 300;">LINE公式アカウントのメニューから、お電話でのご予約や法人様のご注文がすぐできます。新メニューやイベント情報はLINE・Instagram・TikTokで発信中です。</p>
+  </div>
+  <div class="cta-actions">
+    <a href="https://line.me/R/ti/p/%40401pisua" target="_blank" rel="noopener" class="btn" style="background: var(--gold-soft); color: var(--wine-deep); border-color: var(--gold-soft);">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.5 2 2 5.8 2 10.4c0 3.1 2.1 5.8 5.2 7.3-.2.7-.7 2.4-.8 2.8-.1.5.2.5.4.3.2-.1 2.8-1.9 3.9-2.6.7.1 1.5.2 2.3.2 5.5 0 10-3.8 10-8.4C22 5.8 17.5 2 12 2z" fill="#43110F"/></svg>
+      LINE友だち追加
+    </a>
+    <a href="https://www.instagram.com/y.chickenlab/" target="_blank" rel="noopener" class="btn btn-outline">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="5" stroke="white" stroke-width="1.5"/><circle cx="12" cy="12" r="4.2" stroke="white" stroke-width="1.5"/><circle cx="17.2" cy="6.8" r="1.1" fill="white"/></svg>
+      Instagram
+    </a>
+    <a href="https://www.tiktok.com/@y.chickenlab" target="_blank" rel="noopener" class="btn btn-outline">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M14 3c.4 2.2 1.9 3.7 4 4v2.6c-1.4 0-2.7-.4-4-1.2v6.4a5.2 5.2 0 1 1-4.4-5.1v2.7a2.5 2.5 0 1 0 1.8 2.4V3H14z" fill="white"/></svg>
+      TikTok
+    </a>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div style="width: 100%; background: var(--ink);">
+  <div class="footer-inner">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <img src="https://mine0829.github.io/chickenlab-lp/images/logo.png" alt="ロゴ" style="width: 30px; height: 30px; object-fit: contain; border-radius: 50%;">
+      <span style="color: rgba(245,239,224,0.85); font-size: 12.5px;">© ヤンニョムチキン研究所</span>
+    </div>
+    <div class="footer-links">
+      <a href="#concept">こだわり</a>
+      <a href="#menu">メニュー</a>
+      <a href="#shop">店舗情報</a>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
