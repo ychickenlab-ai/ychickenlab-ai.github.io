@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ヤンニョムチキン研究所 テイクアウト注文</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Shippori+Mincho+B1:wght@700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+/* layout: poster-red hero (the bold moment), then a quiet cream "menu paper" with a sticky category bar; chicken builder = photo stage + controls (two columns on wide screens) */
+:root{
+  --red:#AE1112; --red-deep:#7E0B0C; --yellow:#FFE45C; --cream:#F4EADB; --paper:#FBF6EE; --ink:#2A1C18; --muted:#7A6A60; --line:#E2D3C0; --gold:#B8862B; --ok:#2F7A4B;
+  --serif-en:"Playfair Display",Georgia,serif;
+  --poster:"Anton","Impact",sans-serif;
+  --serif-ja:"Shippori Mincho B1","Hiragino Mincho ProN",serif;
+  --body:"Zen Kaku Gothic New","Hiragino Sans","Hiragino Kaku Gothic ProN",sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--cream);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+img{max-width:100%;display:block}
+button{font:inherit;color:inherit}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible{outline:3px solid var(--yellow);outline-offset:2px;box-shadow:0 0 0 5px var(--red)}
+
+/* ---------- hero ---------- */
+.hero{position:relative;background:var(--red);color:#fff;overflow:hidden;padding:20px 16px 0}
+.hero::before{content:"";position:absolute;inset:0;background:radial-gradient(120% 70% at 50% 100%,rgba(0,0,0,.28),transparent 60%);pointer-events:none}
+.hero-in{position:relative;max-width:1080px;margin:0 auto;display:grid;gap:8px}
+.brand{display:flex;align-items:center;gap:14px}
+.brand img{width:76px;height:76px;filter:drop-shadow(0 4px 10px rgba(0,0,0,.25))}
+.brand .jp{font-family:var(--body);font-weight:900;font-size:22px;letter-spacing:.02em;color:#1a0a0a;line-height:1.1;text-shadow:0 1px 0 rgba(255,255,255,.12)}
+.brand .en{display:inline-block;margin-top:5px;background:#120808;color:var(--red);font-family:var(--poster);letter-spacing:.06em;font-size:12px;padding:2px 9px;transform:skew(-6deg)}
+.brand .en b{color:var(--yellow);font-weight:400}
+.headline{text-align:center;margin:26px 0 0;line-height:.86}
+.headline .d{display:block;font-family:var(--serif-en);font-style:italic;font-weight:700;color:var(--yellow);font-size:clamp(46px,11vw,112px);letter-spacing:-.01em}
+.headline .c{display:block;font-family:var(--poster);color:var(--yellow);font-size:clamp(78px,21vw,220px);letter-spacing:.01em;transform:skew(-8deg);margin-top:-4px}
+.headline .w{display:inline-block;animation:rise .7s cubic-bezier(.2,.9,.3,1.2) both}
+.tagline{text-align:center;font-weight:700;font-size:15px;margin:10px 0 0;letter-spacing:.06em}
+.hero-cta{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:16px 0 0}
+.btn{appearance:none;border:none;cursor:pointer;border-radius:999px;padding:14px 26px;font-weight:900;letter-spacing:.04em;font-size:16px;transition:transform .15s,box-shadow .15s}
+.btn:active{transform:scale(.97)}
+.btn-y{background:var(--yellow);color:var(--red-deep);box-shadow:0 6px 0 #c9a51e}
+.btn-y:hover{transform:translateY(-2px)}
+.btn-ghost{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.7)}
+.stage{position:relative;height:clamp(250px,54vw,520px);margin-top:12px}
+.stage .box{position:absolute;left:50%;bottom:-18%;width:min(86%,640px);transform:translateX(-58%);animation:boxIn 1s .25s cubic-bezier(.2,.9,.25,1) both;will-change:transform}
+.stage .can{position:absolute;left:50%;bottom:4%;width:min(23%,170px);transform:translateX(150%) rotate(8deg);animation:canIn .9s .75s cubic-bezier(.3,1.4,.5,1) both;filter:drop-shadow(0 10px 14px rgba(0,0,0,.35))}
+.stamp{position:absolute;right:max(16px,calc(50% - 520px));top:8px;width:96px;height:96px;border-radius:50%;background:#fff;color:var(--red);display:grid;place-items:center;text-align:center;font-family:var(--serif-en);font-weight:900;line-height:1;font-size:19px;transform:rotate(-12deg);box-shadow:0 0 0 4px var(--red),0 0 0 6px #fff;animation:stampIn .5s 1.3s both}
+.stamp small{display:block;font-family:var(--body);font-size:10px;font-weight:700;margin-top:4px}
+@keyframes rise{from{transform:translateY(40px)}to{transform:none}}
+@keyframes boxIn{from{transform:translate(-58%,30%) rotate(-6deg)}to{transform:translateX(-58%) rotate(0)}}
+@keyframes canIn{from{transform:translate(150%,-60%) rotate(30deg)}to{transform:translateX(150%) rotate(8deg)}}
+@keyframes stampIn{from{transform:rotate(-40deg) scale(1.6)}to{transform:rotate(-12deg) scale(1)}}
+
+/* ---------- info + nav ---------- */
+.info{background:var(--red-deep);color:#fff;font-size:13px}
+.info div{max-width:1080px;margin:0 auto;padding:9px 16px;display:flex;gap:6px 18px;flex-wrap:wrap;justify-content:center}
+.info b{color:var(--yellow);font-weight:700;margin-right:4px}
+.nav{position:sticky;top:0;z-index:20;background:rgba(251,246,238,.94);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.nav-in{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:6px;padding:8px 12px;overflow-x:auto;scrollbar-width:none}
+.nav-in::-webkit-scrollbar{display:none}
+.nav a{flex:none;text-decoration:none;color:var(--ink);font-weight:700;font-size:14px;padding:7px 14px;border-radius:999px;transition:background .2s,color .2s}
+.nav a.on{background:var(--red);color:#fff}
+.nav .cartbtn{margin-left:auto;flex:none;display:none;align-items:center;gap:8px;background:var(--ink);color:#fff;border:none;border-radius:999px;padding:8px 16px;font-weight:700;cursor:pointer}
+.nav .cartbtn span{background:var(--yellow);color:var(--ink);border-radius:999px;min-width:22px;text-align:center;font-size:12px;padding:0 6px}
+
+/* ---------- menu paper ---------- */
+main{max-width:1080px;margin:0 auto;padding:8px 16px 140px}
+.pr{margin:22px 0 0;display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;background:var(--ink);color:#fff;border-radius:18px;padding:14px 18px}
+.pr .tag{font-family:var(--poster);color:var(--ink);background:var(--yellow);padding:2px 10px;letter-spacing:.06em;transform:skew(-8deg)}
+.pr p{margin:0;font-size:14px}
+.pr p b{font-size:16px}
+.pr button{background:var(--red);color:#fff;border:none;border-radius:999px;padding:9px 16px;font-weight:700;cursor:pointer;white-space:nowrap}
+section.cat{padding-top:44px;scroll-margin-top:56px}
+.sec-h{display:flex;align-items:baseline;gap:12px;margin:0 0 18px}
+.sec-h h2{margin:0;font-family:var(--serif-en);font-weight:900;color:var(--red);font-size:clamp(30px,6vw,44px);letter-spacing:.01em;line-height:1}
+.sec-h span{font-family:var(--serif-ja);font-weight:800;font-size:15px}
+.sec-h i{flex:1;height:2px;background:var(--red);transform-origin:left;transform:scaleX(.15);transition:transform .9s cubic-bezier(.2,.8,.2,1);align-self:center}
+.sec-h.seen i{transform:scaleX(1)}
+
+/* chicken builder */
+.builder{display:grid;gap:22px;grid-template-columns:1fr}
+.stagecard{position:relative;background:var(--paper);border-radius:24px;border:1px solid var(--line);padding:18px;overflow:hidden;min-height:340px;display:grid;place-items:center}
+.stagecard .ring{position:absolute;width:78%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,#fff 0,#f6e7d2 60%,transparent 61%)}
+.stagecard img.photo{position:relative;width:min(88%,430px);aspect-ratio:1;object-fit:contain;animation:pop .45s cubic-bezier(.2,1.3,.4,1)}
+.stagecard .fname{position:absolute;left:18px;bottom:16px;right:18px;display:flex;justify-content:space-between;align-items:flex-end;gap:10px}
+.stagecard .fname b{font-family:var(--serif-ja);font-size:22px;line-height:1.2}
+.stagecard .fname small{display:block;font-size:13px;color:var(--muted);font-family:var(--body);font-weight:500}
+.pieces{display:flex;flex-wrap:wrap;gap:4px;max-width:150px;justify-content:flex-end}
+.pieces i{width:14px;height:14px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--line);background:var(--line);transition:background .25s}
+@keyframes pop{from{transform:scale(.82) rotate(-6deg);opacity:.2}to{transform:none;opacity:1}}
+.controls{display:flex;flex-direction:column;gap:20px}
+.step-t{font-weight:900;font-size:15px;margin:0 0 10px;display:flex;align-items:center;gap:8px}
+.step-t em{font-style:normal;font-family:var(--serif-en);background:var(--red);color:#fff;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:13px}
+.step-t small{font-weight:500;color:var(--muted);font-size:13px}
+.sizes{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.size{position:relative;cursor:pointer;background:var(--paper);border:2px solid var(--line);border-radius:18px;padding:12px 6px 10px;text-align:center;transition:border-color .2s,transform .2s,background .2s}
+.size:hover{transform:translateY(-2px)}
+.size .n{display:inline-grid;place-items:center;width:46px;height:46px;border-radius:50%;background:var(--red);color:#fff;font-family:var(--serif-en);font-weight:900;font-size:22px;line-height:1}
+.size .n small{font-family:var(--body);font-size:9px;font-weight:700;display:block;margin-top:-6px}
+.size .p{display:block;font-family:var(--serif-en);font-weight:900;font-size:20px;margin-top:6px;font-variant-numeric:tabular-nums}
+.size .p small{font-family:var(--body);font-size:12px}
+.size .m{display:block;font-size:11px;color:var(--muted)}
+.size[aria-pressed="true"]{border-color:var(--red);background:#fff;box-shadow:0 6px 18px rgba(174,17,18,.15)}
+.size[aria-pressed="true"]::after{content:"✓";position:absolute;top:-8px;right:-6px;width:24px;height:24px;border-radius:50%;background:var(--red);color:#fff;font-size:13px;display:grid;place-items:center;font-weight:900}
+.flavors{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.flv{position:relative;cursor:pointer;display:grid;grid-template-columns:52px 1fr;gap:10px;align-items:center;text-align:left;background:var(--paper);border:2px solid var(--line);border-radius:16px;padding:8px 10px 8px 8px;transition:border-color .2s,background .2s,opacity .2s}
+.flv img{width:52px;height:52px;object-fit:contain}
+.flv b{display:block;font-size:14px;line-height:1.3}
+.flv small{display:block;font-size:11px;color:var(--muted);line-height:1.35}
+.flv[aria-pressed="true"]{border-color:var(--red);background:#fff}
+.flv .cnt{position:absolute;top:-9px;right:-6px;min-width:26px;height:26px;padding:0 7px;border-radius:999px;background:var(--red);color:#fff;font-weight:900;font-size:13px;display:grid;place-items:center;animation:pop .3s}
+.flv:disabled{opacity:.45;cursor:not-allowed}
+.hot{display:inline-block;font-size:10px;background:var(--red);color:#fff;border-radius:4px;padding:0 4px;margin-left:4px;vertical-align:2px}
+.splits{display:flex;flex-direction:column;gap:8px}
+.split{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:8px 10px}
+.split .dot{width:14px;height:14px;border-radius:50%;flex:none}
+.split b{flex:1;font-size:14px}
+.stepper{display:flex;align-items:center;gap:4px}
+.stepper button{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--line);background:var(--paper);cursor:pointer;font-size:18px;font-weight:700;line-height:1}
+.stepper button:disabled{opacity:.35;cursor:not-allowed}
+.stepper output{min-width:46px;text-align:center;font-weight:900;font-variant-numeric:tabular-nums}
+.quick{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:1.5px solid var(--ink);background:transparent;border-radius:999px;padding:6px 12px;font-size:13px;font-weight:700;cursor:pointer}
+.chip:hover{background:var(--ink);color:#fff}
+.hint{font-size:13px;font-weight:700;color:var(--red);min-height:1.4em;margin:0}
+.hint.ok{color:var(--ok)}
+.addbar{display:flex;align-items:center;gap:12px;background:var(--ink);color:#fff;border-radius:20px;padding:12px 12px 12px 18px}
+.addbar .tot{flex:1;line-height:1.2}
+.addbar .tot small{display:block;font-size:12px;opacity:.75}
+.addbar .tot b{font-family:var(--serif-en);font-weight:900;font-size:28px;font-variant-numeric:tabular-nums}
+.addbar .tot b.bump{animation:bump .35s}
+@keyframes bump{40%{transform:scale(1.15)}}
+.qty{display:flex;align-items:center;gap:2px;background:rgba(255,255,255,.12);border-radius:999px;padding:3px}
+.qty button{width:32px;height:32px;border:none;border-radius:50%;background:transparent;color:#fff;font-size:18px;cursor:pointer}
+.qty output{min-width:22px;text-align:center;font-weight:900}
+.add{background:var(--yellow);color:var(--ink);border:none;border-radius:999px;padding:12px 18px;font-weight:900;cursor:pointer;white-space:nowrap}
+.add:disabled{background:#6b625d;color:#cfc6c0;cursor:not-allowed}
+
+/* simple items */
+.items{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+.item{background:var(--paper);border:1px solid var(--line);border-radius:22px;overflow:hidden;display:flex;flex-direction:column}
+.item .pic{position:relative;height:200px;background:radial-gradient(circle at 50% 60%,#fff 0,#f3e4cf 70%);display:grid;place-items:center;overflow:hidden}
+.item .pic img{max-height:180px;width:auto;object-fit:contain;animation:pop .45s cubic-bezier(.2,1.3,.4,1)}
+.item .pic img.cover{width:100%;height:100%;max-height:none;object-fit:cover}
+.item .pic .bubble{position:absolute;right:12px;top:12px;background:#fff;color:var(--red);font-weight:900;font-size:12px;border:2px solid var(--red);border-radius:16px;padding:4px 10px;transform:rotate(6deg)}
+.item .body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:10px;flex:1}
+.item h3{margin:0;font-family:var(--serif-ja);font-size:20px;line-height:1.3}
+.item h3 small{font-family:var(--serif-en);color:var(--red);font-size:12px;letter-spacing:.12em;display:block}
+.item p{margin:0;font-size:13px;color:var(--muted)}
+.opts{display:flex;gap:6px;flex-wrap:wrap}
+.opt{border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:6px 10px;font-size:13px;font-weight:700;cursor:pointer;text-align:left;line-height:1.3}
+.opt small{display:block;font-weight:500;color:var(--muted);font-size:11px}
+.opt[aria-pressed="true"]{border-color:var(--red);color:var(--red);background:#fff4f2}
+.item .row{margin-top:auto;display:flex;align-items:center;gap:10px}
+.item .price{flex:1;font-family:var(--serif-en);font-weight:900;font-size:26px;font-variant-numeric:tabular-nums}
+.item .price small{font-family:var(--body);font-size:13px}
+.item .add{padding:10px 16px;background:var(--red);color:#fff}
+
+/* cart bar + drawer */
+.cartbar{position:fixed;left:12px;right:12px;bottom:max(12px,env(safe-area-inset-bottom));z-index:30;display:flex;align-items:center;gap:12px;background:var(--red);color:#fff;border:none;border-radius:20px;padding:12px 14px 12px 16px;box-shadow:0 12px 30px rgba(126,11,12,.35);cursor:pointer;text-align:left;transition:transform .3s cubic-bezier(.2,1.2,.4,1)}
+.cartbar.hide{transform:translateY(140%)}
+.cartbar .badge{background:var(--yellow);color:var(--ink);border-radius:12px;min-width:34px;height:34px;display:grid;place-items:center;font-weight:900}
+.cartbar .badge.bump{animation:bump .4s}
+.cartbar .t{flex:1;line-height:1.2}
+.cartbar .t small{display:block;font-size:12px;opacity:.85}
+.cartbar .t b{font-family:var(--serif-en);font-size:22px;font-weight:900}
+.cartbar .go{font-weight:900;background:#fff;color:var(--red);border-radius:999px;padding:8px 14px}
+.scrim{position:fixed;inset:0;background:rgba(30,15,12,.5);z-index:40;animation:fade .25s}
+@keyframes fade{from{opacity:0}}
+.drawer{position:fixed;z-index:41;left:0;right:0;bottom:0;max-height:88%;background:var(--paper);border-radius:24px 24px 0 0;display:flex;flex-direction:column;animation:up .35s cubic-bezier(.2,1,.3,1)}
+@keyframes up{from{transform:translateY(100%)}}
+.drawer header{display:flex;align-items:center;justify-content:space-between;padding:18px 18px 10px;border-bottom:1px solid var(--line)}
+.drawer header h2{margin:0;font-family:var(--serif-en);font-weight:900;color:var(--red);font-size:26px}
+.drawer header h2 span{font-family:var(--serif-ja);color:var(--ink);font-size:15px;margin-left:8px}
+.x{width:38px;height:38px;border-radius:50%;border:none;background:var(--cream);cursor:pointer;font-size:20px}
+.drawer .scroll{overflow-y:auto;padding:12px 18px;flex:1}
+.line{display:grid;grid-template-columns:56px 1fr auto;gap:12px;align-items:center;padding:12px 0;border-bottom:1px dashed var(--line);animation:slide .3s}
+@keyframes slide{from{transform:translateX(20px);opacity:.3}}
+.line img{width:56px;height:56px;object-fit:contain;background:#fff;border-radius:12px}
+.line b{display:block;font-size:15px;line-height:1.3}
+.line small{display:block;font-size:12px;color:var(--muted);line-height:1.4}
+.line .r{text-align:right;display:flex;flex-direction:column;gap:6px;align-items:flex-end}
+.line .r strong{font-variant-numeric:tabular-nums}
+.line .mini{display:flex;align-items:center;gap:2px;border:1px solid var(--line);border-radius:999px;background:#fff}
+.line .mini button{width:28px;height:28px;border:none;background:none;cursor:pointer;font-size:16px}
+.line .mini output{min-width:18px;text-align:center;font-weight:700;font-size:14px}
+.empty{text-align:center;padding:40px 10px;color:var(--muted)}
+.drawer footer{padding:14px 18px max(18px,env(safe-area-inset-bottom));border-top:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
+.sum{display:flex;justify-content:space-between;align-items:baseline}
+.sum b{font-family:var(--serif-en);font-weight:900;font-size:30px;font-variant-numeric:tabular-nums}
+.primary{width:100%;background:var(--red);color:#fff;border:none;border-radius:16px;padding:15px;font-weight:900;font-size:16px;cursor:pointer}
+.primary:disabled{background:#c9b9aa;cursor:not-allowed}
+.secondary{width:100%;background:transparent;border:1.5px solid var(--ink);border-radius:16px;padding:12px;font-weight:700;cursor:pointer}
+
+/* checkout + done */
+.page{position:fixed;inset:0;z-index:50;background:var(--cream);overflow-y:auto;animation:fade .3s}
+.page-in{max-width:620px;margin:0 auto;padding:18px 16px 40px;display:flex;flex-direction:column;gap:16px}
+.page h2{margin:6px 0 0;font-family:var(--serif-en);font-weight:900;color:var(--red);font-size:34px;line-height:1}
+.page h2 span{display:block;font-family:var(--serif-ja);color:var(--ink);font-size:16px;margin-top:6px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:16px}
+.card h3{margin:0 0 10px;font-size:15px}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.field label{font-size:13px;font-weight:700}
+.field input,.field select,.field textarea{font:inherit;font-size:16px;padding:11px 12px;border:1.5px solid var(--line);border-radius:12px;background:#fff;color:var(--ink)}
+.times{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.times button{border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:9px 0;font-weight:700;cursor:pointer;font-variant-numeric:tabular-nums}
+.times button[aria-pressed="true"]{background:var(--red);border-color:var(--red);color:#fff}
+.demo{font-size:12px;color:var(--muted);text-align:center}
+.back{align-self:flex-start;background:none;border:none;color:var(--red);font-weight:700;cursor:pointer;padding:6px 0}
+.done{text-align:center;align-items:center}
+.check{width:110px;height:110px;border-radius:50%;background:var(--red);display:grid;place-items:center;margin:20px auto 4px;animation:stampIn .5s both}
+.check svg{width:56px;height:56px}
+.check path{stroke-dasharray:60;stroke-dashoffset:60;animation:draw .5s .35s forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.ticket{width:100%;background:#fff;border-radius:20px;border:2px dashed var(--red);padding:18px;text-align:left}
+.ticket .no{font-family:var(--poster);font-size:40px;color:var(--red);letter-spacing:.04em;text-align:center;line-height:1}
+.ticket .when{text-align:center;font-weight:900;margin:6px 0 12px}
+.ticket ul{margin:0;padding:0;list-style:none;border-top:1px solid var(--line)}
+.ticket li{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px}
+.toast{position:fixed;left:50%;top:70px;z-index:60;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;font-weight:700;font-size:14px;animation:toast 1.8s both;pointer-events:none;white-space:nowrap}
+@keyframes toast{0%{transform:translate(-50%,-20px);opacity:0}12%,80%{transform:translate(-50%,0);opacity:1}100%{opacity:0}}
+.flv.out{opacity:.5}
+.flv.out b{text-decoration:line-through}
+.item.out .pic img{filter:grayscale(1);opacity:.55}
+.soldtag{position:absolute;z-index:2;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-8deg);background:var(--ink);color:#fff;font-weight:900;padding:8px 16px;border-radius:8px;letter-spacing:.06em}
+.banner{text-align:center;font-size:14px;padding:10px 16px;font-weight:500}
+.banner b{display:inline-block;margin-right:10px;padding:1px 10px;border-radius:999px;font-size:12px}
+.b-open{background:#E8F4EC;color:#1F5A36}.b-open b{background:var(--ok);color:#fff}
+.b-off{background:#EFE7DC;color:var(--ink)}.b-off b{background:var(--ink);color:#fff}
+.b-stop{background:#FBE3E1;color:var(--red-deep)}.b-stop b{background:var(--red);color:#fff}
+.b-notice{background:var(--yellow);color:var(--ink);font-weight:700}
+.k-out{width:100%;min-height:90px;margin-top:10px;font:12px monospace;border-radius:10px;padding:10px}
+.kitchen{min-height:100vh;background:#1E1715;color:#F4EADB;padding:20px 16px 60px}
+.k-in{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.k-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.k-en{font-family:var(--poster);color:var(--yellow);letter-spacing:.12em;font-size:14px}
+.k-head h1{margin:0;font-family:var(--serif-ja);font-size:26px}
+.k-link{color:#F4EADB;font-size:14px;opacity:.8}
+.k-status{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;border-radius:20px;padding:18px 20px}
+.k-status small{display:block;font-size:12px;opacity:.8}.k-status b{display:block;font-size:30px;font-family:var(--serif-ja);line-height:1.2}.k-status span{font-size:14px}
+.k-open{background:#1F5A36}.k-stop{background:var(--red)}.k-off{background:#4A3E39}
+.k-big{border:none;border-radius:16px;padding:16px 22px;font-size:18px;font-weight:900;background:#fff;color:var(--ink);cursor:pointer;min-height:56px}
+.k-big:disabled{opacity:.6}
+.k-card{background:#2A211E;border:1px solid #3B302C;border-radius:20px;padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.k-card h2{margin:0;font-size:17px;display:flex;flex-direction:column;gap:2px}.k-card h2 span{font-size:12px;font-weight:500;opacity:.7}
+.k-special{border-color:var(--yellow)}
+.k-card h3{margin:6px 0 0;font-size:13px;opacity:.8}
+.k-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.k-card label{display:flex;flex-direction:column;gap:6px;font-size:13px}
+.k-card select,.k-card input{font:inherit;font-size:16px;padding:10px;border-radius:12px;border:1px solid #4A3E39;background:#1E1715;color:#F4EADB}
+.k-note{margin:0;font-size:12px;opacity:.7}
+.k-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.kchip{text-align:left;border:1.5px solid #4A3E39;background:#1E1715;color:#F4EADB;border-radius:14px;padding:10px 12px;font-weight:700;cursor:pointer;min-height:56px}
+.kchip small{display:block;font-weight:500;font-size:12px;color:#8FD3A6}
+.kchip.on{background:#3A1214;border-color:var(--red)}.kchip.on small{color:#FF9C9C}
+.k-clear{align-self:flex-start;background:none;border:1px solid #4A3E39;color:#F4EADB;border-radius:999px;padding:8px 14px;cursor:pointer}
+.k-save{position:sticky;bottom:12px;background:#1E1715;padding:10px 0;display:flex;flex-direction:column;gap:6px}
+.k-save p{margin:0;font-size:13px;text-align:center;opacity:.85}
+footer.site{background:var(--ink);color:#e9dfd6;font-size:13px;padding:28px 16px 120px}
+footer.site div{max-width:1080px;margin:0 auto;display:flex;flex-direction:column;gap:6px}
+footer.site b{color:#fff;font-size:15px}
+
+@media (min-width:860px){
+  .builder{grid-template-columns:1.05fr 1fr;align-items:start}
+  .stagecard{position:sticky;top:76px;min-height:520px}
+  .nav .cartbtn{display:flex}
+  .cartbar{left:auto;right:24px;width:380px}
+  .drawer{left:auto;top:0;width:420px;max-height:none;border-radius:24px 0 0 24px;animation:side .35s cubic-bezier(.2,1,.3,1)}
+  @keyframes side{from{transform:translateX(100%)}}
+  .headline{margin-top:0}
+  .headline .d{font-size:84px}
+  .headline .c{font-size:160px}
+  .stage{height:420px;margin-top:0}
+  .flavors{grid-template-columns:repeat(2,1fr)}
+  .flv{grid-template-columns:60px 1fr}
+  .flv img{width:60px;height:60px}
+}
+@media (max-width:420px){.pr{grid-template-columns:1fr;text-align:left}.times{grid-template-columns:repeat(3,1fr)}}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script id="shop-state" type="application/json">{"accepting":true,"open":"11:00","last":"14:30","soldOut":[],"soldDate":"","notice":"","specialOpen":""}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/htm@3.1.1/dist/htm.umd.js"></script>
+<script>
+const {useState,useEffect,useRef,useMemo,useCallback}=React;
+const html=htm.bind(React.createElement);
+let STATE={accepting:true,open:"11:00",last:"14:30",soldOut:[],soldDate:"",notice:"",specialOpen:""};
+try{STATE={...STATE,...JSON.parse(document.getElementById("shop-state").textContent)}}catch(e){}
+const toMin=t=>{const [h,m]=String(t).split(":").map(Number);return h*60+(m||0)};
+const todayKey=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`};
+const EDIT_URL="https://github.com/ychickenlab-ai/ychickenlab-ai.github.io/edit/main/order/state.json";
+function shopStatus(st,now){
+  if(!st.accepting) return {open:false,kind:"stop",msg:"ただいまテイクアウトの受付を止めています"};
+  if(!isOpen(now)&&st.specialOpen!==todayKey()) return {open:false,kind:"off",msg:now.getDay()===2?"本日は定休日です（火曜日）":"本日はお休みをいただいています"};
+  const m=now.getHours()*60+now.getMinutes();
+  if(m<toMin(st.open)) return {open:false,kind:"off",msg:`本日の受付は ${st.open} からです`};
+  if(m>toMin(st.last)) return {open:false,kind:"off",msg:`本日の受付は終了しました（${st.last}まで）`};
+  return {open:true,kind:"open",msg:`受付中（${st.last}まで）`};
+}
+const soldSet=st=>new Set(st.soldDate===todayKey()?st.soldOut:[]);
+const yen=n=>n.toLocaleString("ja-JP");
+
+const FLAVORS=[
+  {id:"ama",name:"ヤンニョム 甘口",short:"甘口",desc:"韓国の甘辛いたれ。やさしい甘さ",img:"img/flavor_yangnyeom.webp",color:"#C8321E"},
+  {id:"kara",name:"ヤンニョム 辛口",short:"辛口",desc:"甘辛だれに、ピリッと辛さ",img:"img/flavor_yangnyeom.webp",color:"#7E0B0C",hot:true},
+  {id:"hbc",name:"ハニーバターチーズ",short:"ハニバタ",desc:"はちみつの甘さに、バターとチーズのコク",img:"img/flavor_honeybutter.webp",color:"#E9D9B4"},
+  {id:"gar",name:"ガーリック山椒",short:"ガーリック",desc:"にんにくの香りに、山椒がピリッと",img:"img/flavor_garlic.webp",color:"#B9692C"},
+  {id:"mus",name:"ハニーマスタード",short:"マスタード",desc:"はちみつと粒マスタードの、まろやかな味",img:"img/flavor_mustard.webp",color:"#E3B41E"},
+];
+const FL=Object.fromEntries(FLAVORS.map(f=>[f.id,f]));
+const SIZES=[{p:4,price:800,max:2},{p:8,price:1500,max:4},{p:12,price:2100,max:4}];
+
+const SIMPLE=[
+  {id:"chumoppa",cat:"chumoppa",en:"CHUMOPPA",name:"チュモッパ",desc:"ごま入りのごはんに、韓国のりとたくあんをのせた韓国の定番ごはん",
+   opts:[{id:"1",label:"1人前",sub:"150g",price:450,img:"img/chumoppa.webp"},{id:"2",label:"2人前",sub:"300g",price:800,img:"img/chumoppa.webp"}]},
+  {id:"karaage",cat:"karaage",en:"KARAAGE",name:"唐揚げ",desc:"国産鶏ももの唐揚げ。数が多いほどお得です",
+   opts:[{id:"3",label:"3個",sub:"1個150円",price:450,img:"img/karaage.webp"},{id:"5",label:"5個",sub:"1個140円",price:700,img:"img/karaage.webp"},{id:"10",label:"10個",sub:"1個135円",price:1350,img:"img/karaage.webp"}]},
+  {id:"cheese",cat:"side",en:"SIDE",name:"チーズボール",desc:"注文を受けてから揚げます。のび〜るチーズが美味しい！",bubble:"のび〜る！",
+   opts:[{id:"3",label:"3個",sub:"",price:500,img:"img/cheeseball.webp"}]},
+  {id:"osatsu",cat:"side",en:"SIDE",name:"おさつボール",desc:"ほくほく甘い、さつまいものボール",bubble:"秋限定",
+   opts:[{id:"5",label:"5個",sub:"",price:500,img:"img/osatsu.webp"}]},
+  {id:"burger",cat:"burger",en:"NEW",name:"チキンバーガー",desc:"国産鶏ももの揚げたてチキン、キャベツ、チーズ。ポテト付き",bubble:"NEW",
+   opts:[{id:"p",label:"ポテト付き",sub:"",price:900,img:"img/burger.webp"},{id:"s",label:"＋韓国サイダー",sub:"ドリンクセット",price:1100,img:"img/burger.webp"},{id:"b",label:"＋ボンボン",sub:"ドリンクセット",price:1200,img:"img/burger.webp"}]},
+  {id:"drink-peach",cat:"drink",en:"BONBON",name:"ボンボン 桃",desc:"果肉入りの桃ジュース。やさしい甘さ",
+   opts:[{id:"1",label:"1本",sub:"",price:400,img:"img/drink_peach.webp"}]},
+  {id:"drink-grape",cat:"drink",en:"BONBON",name:"ボンボン 白ぶどう",desc:"果肉入りの白ぶどうジュース。いちばん人気",
+   opts:[{id:"1",label:"1本",sub:"",price:400,img:"img/drink_grape2.webp"}]},
+  {id:"drink-pine",cat:"drink",en:"BONBON",name:"ボンボン パイン",desc:"果肉入りのパインジュース。さわやかな酸味",
+   opts:[{id:"1",label:"1本",sub:"",price:400,img:"img/drink_pine.webp"}]},
+  {id:"drink-pear",cat:"drink",en:"PEAR",name:"梨ジュース",desc:"すりおろした梨のジュース。すっきり甘い",
+   opts:[{id:"1",label:"1本",sub:"",price:400,img:"img/drink_pear.webp"}]},
+  {id:"drink-cider",cat:"drink",en:"CIDER",name:"チルソンサイダー",desc:"韓国で人気の、すっきりしたサイダー",
+   opts:[{id:"1",label:"1本",sub:"",price:300,img:"img/drink_cider.webp"}]},
+];
+
+function evenSplit(ids,total){
+  const o={};if(!ids.length)return o;
+  const base=Math.floor(total/ids.length);let rest=total-base*ids.length;
+  ids.forEach(id=>{o[id]=base+(rest>0?1:0);rest--;});return o;
+}
+function useLS(key,init){
+  const [v,setV]=useState(()=>{try{const s=localStorage.getItem(key);return s?JSON.parse(s):init}catch(e){return init}});
+  useEffect(()=>{try{localStorage.setItem(key,JSON.stringify(v))}catch(e){}},[key,v]);
+  return [v,setV];
+}
+
+function Hero({onStart}){
+  const boxRef=useRef(null);
+  useEffect(()=>{
+    const reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if(reduce)return;
+    const on=()=>{const y=Math.min(window.scrollY,600);if(boxRef.current)boxRef.current.style.translate=`0 ${y*-0.12}px`;};
+    window.addEventListener("scroll",on,{passive:true});return()=>window.removeEventListener("scroll",on);
+  },[]);
+  const word="CHICKEN".split("");
+  return html`<header class="hero">
+    <div class="hero-in">
+      <div class="brand">
+        <img src="img/logo.png" alt="ヤンニョムチキン研究所のロゴ"/>
+        <div><div class="jp">ヤンニョムチキン研究所</div><div class="en">YANGNYEOM CHICKEN <b>LAB</b></div></div>
+      </div>
+      <div class="stamp">TAKE<br/>OUT<small>お持ち帰り専用</small></div>
+      <h1 class="headline" aria-label="Delicious CHICKEN">
+        <span class="d">${"Delicious".split("").map((c,i)=>html`<span class="w" key=${i} style=${{animationDelay:(i*0.035)+"s"}}>${c}</span>`)}</span>
+        <span class="c">${word.map((c,i)=>html`<span class="w" key=${i} style=${{animationDelay:(0.3+i*0.05)+"s"}}>${c}</span>`)}</span>
+      </h1>
+      <p class="tagline">国産鶏ももを、手で食べる韓国チキンに。</p>
+      <div class="hero-cta">
+        <button class="btn btn-y" onClick=${onStart}>テイクアウトを注文する</button>
+      </div>
+      <div class="stage" ref=${boxRef}>
+        <img class="box" src="img/box.webp" alt="4種類の味が入ったテイクアウトのチキンボックス"/>
+        <img class="can" src="img/drink_grape.webp" alt="ボンボン 白ぶどうジュース"/>
+      </div>
+    </div>
+  </header>`;
+}
+
+function SecHead({en,ja}){
+  const r=useRef(null);
+  useEffect(()=>{const el=r.current;if(!el||!("IntersectionObserver" in window)){el&&el.classList.add("seen");return;}
+    const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){el.classList.add("seen");io.disconnect();}}),{threshold:.6});io.observe(el);return()=>io.disconnect();},[]);
+  return html`<div class="sec-h" ref=${r}><h2>${en}</h2><span>${ja}</span><i></i></div>`;
+}
+
+function ChickenBuilder({onAdd,so,closed}){
+  const [size,setSize]=useState(SIZES[0]);
+  const [counts,setCounts]=useState(()=>{const av=FLAVORS.filter(f=>!so.has("f:"+f.id)).map(f=>f.id);return evenSplit(av.slice(0,2),4)});
+  const [focus,setFocus]=useState(()=>(FLAVORS.find(f=>!so.has("f:"+f.id))||FLAVORS[0]).id);
+  const [qty,setQty]=useState(1);
+  const [bump,setBump]=useState(0);
+  const ids=Object.keys(counts);
+  const sum=ids.reduce((a,k)=>a+counts[k],0);
+  const remain=size.p-sum;
+  const total=size.price*qty;
+  useEffect(()=>{setBump(b=>b+1)},[total]);
+
+  const pickSize=s=>{
+    setSize(s);
+    let keep=ids.slice(0,s.max);
+    if(!keep.length)keep=[focus];
+    setCounts(evenSplit(keep,s.p));
+  };
+  const toggle=id=>{
+    setFocus(id);
+    if(counts[id]!==undefined){
+      const rest=ids.filter(k=>k!==id);
+      if(!rest.length)return;
+      setCounts(evenSplit(rest,size.p));
+    }else{
+      if(ids.length>=size.max)return;
+      setCounts(evenSplit([...ids,id],size.p));
+    }
+  };
+  const step=(id,d)=>{
+    const n=(counts[id]||0)+d;
+    if(d>0&&remain<=0)return;
+    const c={...counts};
+    if(n<=0){delete c[id];}else c[id]=n;
+    setCounts(c);setFocus(id);
+  };
+  const half=()=>{const k=ids.length?ids:[focus];setCounts(evenSplit(k,size.p));};
+  const allFour=()=>{const k=FLAVORS.filter(f=>!so.has("f:"+f.id)).map(f=>f.id).slice(0,4);setCounts(evenSplit(k,size.p));setFocus("gar");};
+  const chickenOut=so.has("chicken");
+  const ok=remain===0&&ids.length>0&&ids.length<=size.max&&!chickenOut&&!closed&&!ids.some(k=>so.has("f:"+k));
+  const f=FL[focus]||FL[ids[0]]||FL.ama;
+  const dots=[];ids.forEach(k=>{for(let i=0;i<counts[k];i++)dots.push(FL[k].color)});while(dots.length<size.p)dots.push(null);
+
+  const add=()=>{
+    if(!ok)return;
+    onAdd({kind:"chicken",flv:[...ids],key:"c"+size.p+"-"+ids.sort().map(k=>k+counts[k]).join("."),name:`チキン ${size.p}ピース`,
+      detail:ids.map(k=>`${FL[k].short}×${counts[k]}`).join("・"),unit:size.price,qty,img:FL[ids[0]].img});
+    setQty(1);
+  };
+  return html`<div class="builder">
+    <div class="stagecard" aria-live="polite">
+      <div class="ring"></div>
+      <img class="photo" key=${f.id+size.p} src=${f.img} alt=${f.name+"のチキン"}/>
+      <div class="fname"><b>${f.name}<small>${f.desc}</small></b>
+        <div class="pieces" aria-label=${`${size.p}ピース中 ${sum}ピース選択`}>${dots.map((c,i)=>html`<i key=${i} style=${c?{background:c}:null}></i>`)}</div>
+      </div>
+    </div>
+    <div class="controls">
+      <div>
+        <p class="step-t"><em>1</em>ピース数を選ぶ</p>
+        <div class="sizes">${SIZES.map(s=>html`<button key=${s.p} class="size" aria-pressed=${size.p===s.p} onClick=${()=>pickSize(s)}>
+          <span class="n">${s.p}<small>ピース</small></span><span class="p">${yen(s.price)}<small>円</small></span><span class="m">味は${s.max}種類まで</span></button>`)}</div>
+      </div>
+      <div>
+        <p class="step-t"><em>2</em>味を選ぶ<small>${size.max}種類まで（${ids.length}/${size.max}）</small></p>
+        <div class="flavors">${FLAVORS.map(fl=>{const on=counts[fl.id]!==undefined;const out=so.has("f:"+fl.id);const full=out||(!on&&ids.length>=size.max);
+          return html`<button key=${fl.id} class=${"flv"+(out?" out":"")} aria-pressed=${on} disabled=${full} onClick=${()=>toggle(fl.id)} onMouseEnter=${()=>!full&&setFocus(fl.id)}>
+            <img src=${fl.img} alt=""/><span><b>${fl.name}${fl.hot?html`<span class="hot">辛</span>`:null}</b><small>${out?"本日売り切れ":fl.desc}</small></span>
+            ${on?html`<span class="cnt">${counts[fl.id]}</span>`:null}</button>`;})}</div>
+      </div>
+      <div>
+        <p class="step-t"><em>3</em>ピースの分け方<small>合計${size.p}ピース</small></p>
+        <div class="quick" style=${{marginBottom:"10px"}}>
+          <button class="chip" onClick=${half}>${ids.length===2?"ハーフ＆ハーフ":"均等に分ける"}</button>
+          ${size.max>=4?html`<button class="chip" onClick=${allFour}>4種のせ</button>`:null}
+        </div>
+        <div class="splits">${ids.map(k=>html`<div class="split" key=${k}><span class="dot" style=${{background:FL[k].color}}></span><b>${FL[k].name}</b>
+          <div class="stepper"><button aria-label=${FL[k].name+"を1ピース減らす"} onClick=${()=>step(k,-1)}>−</button><output>${counts[k]}P</output>
+          <button aria-label=${FL[k].name+"を1ピース増やす"} disabled=${remain<=0} onClick=${()=>step(k,1)}>＋</button></div></div>`)}</div>
+        <p class=${"hint"+(ok?" ok":"")} style=${{marginTop:"8px"}}>${ok?"ぴったりです！":remain>0?`あと${remain}ピース選んでください`:"味を1つ以上選んでください"}</p>
+      </div>
+      <div class="addbar">
+        <div class="tot"><small>チキン ${size.p}ピース × ${qty}</small><b key=${bump} class="bump">${yen(total)}円</b></div>
+        <div class="qty"><button aria-label="数を減らす" onClick=${()=>setQty(q=>Math.max(1,q-1))}>−</button><output>${qty}</output><button aria-label="数を増やす" onClick=${()=>setQty(q=>Math.min(9,q+1))}>＋</button></div>
+        <button class="add" disabled=${!ok} onClick=${add}>${chickenOut?"本日売り切れ":closed?"受付時間外":"カートに入れる"}</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function SimpleItem({it,onAdd,so,closed}){
+  const out=so.has(it.id);
+  const [opt,setOpt]=useState(it.opts[0]);
+  return html`<article class=${"item"+(out?" out":"")} id=${"item-"+it.id}>
+    <div class="pic">${out?html`<span class="soldtag">本日売り切れ</span>`:it.bubble?html`<span class="bubble">${it.bubble}</span>`:null}<img key=${opt.id} class=${it.cover?"cover":""} src=${opt.img} alt=${it.name+" "+opt.label}/></div>
+    <div class="body">
+      <h3><small>${it.en}</small>${it.name}</h3>
+      <p>${it.desc}</p>
+      ${it.opts.length>1?html`<div class="opts" role="group" aria-label=${it.name+"の種類"}>${it.opts.map(o=>html`<button key=${o.id} class="opt" aria-pressed=${opt.id===o.id} onClick=${()=>setOpt(o)}>${o.label}${o.sub?html`<small>${o.sub}</small>`:null}</button>`)}</div>`:null}
+      <div class="row"><div class="price">${yen(opt.price)}<small>円</small></div>
+        <button class="add" disabled=${out||closed} onClick=${()=>onAdd({kind:it.id,key:it.id+"-"+opt.id,name:it.name,detail:opt.label+(opt.sub&&it.id!=="drink"?"（"+opt.sub+"）":""),unit:opt.price,qty:1,img:opt.img})}>${out?"売り切れ":closed?"受付時間外":"カートに入れる"}</button></div>
+    </div>
+  </article>`;
+}
+
+function Cart({cart,setQty,onClose,onCheckout}){
+  const total=cart.reduce((a,l)=>a+l.unit*l.qty,0);
+  useEffect(()=>{const k=e=>e.key==="Escape"&&onClose();addEventListener("keydown",k);return()=>removeEventListener("keydown",k)},[]);
+  return html`<div><div class="scrim" onClick=${onClose}></div>
+  <aside class="drawer" role="dialog" aria-modal="true" aria-label="カート">
+    <header><h2>CART<span>カート</span></h2><button class="x" aria-label="閉じる" onClick=${onClose}>×</button></header>
+    <div class="scroll">${cart.length?cart.map(l=>html`<div class="line" key=${l.key}>
+      <img src=${l.img} alt=""/><div><b>${l.name}</b><small>${l.detail}</small><small>${yen(l.unit)}円</small></div>
+      <div class="r"><strong>${yen(l.unit*l.qty)}円</strong><div class="mini"><button aria-label="減らす" onClick=${()=>setQty(l.key,l.qty-1)}>−</button><output>${l.qty}</output><button aria-label="増やす" onClick=${()=>setQty(l.key,l.qty+1)}>＋</button></div></div>
+    </div>`):html`<div class="empty">カートは空です。<br/>メニューから選んでください。</div>`}</div>
+    <footer><div class="sum"><span>合計（税込）</span><b>${yen(total)}円</b></div>
+      <button class="primary" disabled=${!cart.length} onClick=${onCheckout}>注文内容の確認へ</button>
+      <button class="secondary" onClick=${onClose}>メニューに戻る</button></footer>
+  </aside></div>`;
+}
+
+const LINE_ID="@401pisua";
+const CLOSED=[["2026-11-27","2026-12-01"],["2026-12-18","2027-01-31"]];
+const WDJ=["日","月","火","水","木","金","土"];
+const ymd=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+const fmtT=m=>`${Math.floor(m/60)}:${String(m%60).padStart(2,"0")}`;
+function isOpen(d){if(d.getDay()===2)return false;const k=ymd(d);return !CLOSED.some(([s,e])=>k>=s&&k<=e);}
+function pickupDays(){
+  const now=new Date();
+  if(!shopStatus(STATE,now).open) return [];
+  let st=Math.max(now.getHours()*60+now.getMinutes()+30,toMin(STATE.open)+15);
+  st=Math.ceil(st/15)*15;
+  const end=toMin(STATE.last)+15;const times=[];
+  for(let m=st;m<=end;m+=15)times.push(fmtT(m));
+  if(!times.length) return [];
+  return [{key:ymd(now),label:`${now.getMonth()+1}/${now.getDate()}(${WDJ[now.getDay()]}) 今日`,times}];
+}
+function orderText(o){
+  const lines=o.lines.map(l=>`・${l.name}（${l.detail}）×${l.qty}　${yen(l.unit*l.qty)}円`).join("\n");
+  return `【テイクアウト注文】${o.no}\nお名前：${o.name}\n受け取り：${o.time}\n\n${lines}\n\n合計：${yen(o.total)}円（受け取りのときに店頭でお支払い）`+(o.note?`\nご要望：${o.note}`:"")+`\n\nこのまま送信してください。`;
+}
+const lineUrl=o=>`https://line.me/R/oaMessage/${encodeURIComponent(LINE_ID)}/?${encodeURIComponent(orderText(o))}`;
+
+function Checkout({cart,onBack,onDone,so}){
+  const bad=cart.filter(l=>so.has(l.kind)||(l.kind==="chicken"&&(so.has("chicken")||(l.flv||[]).some(k=>so.has("f:"+k)))));
+  const total=cart.reduce((a,l)=>a+l.unit*l.qty,0);
+  const days=useMemo(pickupDays,[]);
+  const [day,setDay]=useState(days[0]);
+  const [time,setTime]=useState(days[0]?days[0].times[0]:"");
+  const [name,setName]=useState("");
+  const [note,setNote]=useState("");
+  const no=useMemo(()=>"LAB-"+String(Math.floor(1000+Math.random()*9000)),[]);
+  useEffect(()=>{document.querySelector(".page")?.scrollTo(0,0)},[]);
+  const order={no,time:day?`${day.label.replace(/ (今日|明日)$/,"")} ${time}`:"",name:name.trim(),note:note.trim(),total,lines:cart};
+  const ready=!!(day&&time&&name.trim())&&!bad.length;
+  return html`<div class="page" role="dialog" aria-modal="true" aria-label="注文内容の確認"><div class="page-in">
+    <button type="button" class="back" onClick=${onBack}>← カートに戻る</button>
+    <h2>CHECK<span>注文内容の確認</span></h2>
+    <div class="card"><h3>ご注文</h3>${cart.map(l=>html`<div class="line" key=${l.key} style=${{animation:"none"}}><img src=${l.img} alt=""/><div><b>${l.name} × ${l.qty}</b><small>${l.detail}</small></div><div class="r"><strong>${yen(l.unit*l.qty)}円</strong></div></div>`)}
+      <div class="sum" style=${{marginTop:"10px"}}><span>合計（税込）</span><b>${yen(total)}円</b></div></div>
+    ${bad.length?html`<div class="card" style=${{borderColor:"var(--red)",background:"#fff4f2"}}><h3 style=${{color:"var(--red)"}}>売り切れの商品があります</h3><p style=${{margin:0,fontSize:"14px"}}>${bad.map(l=>l.name+"（"+l.detail+"）").join("、")} は本日売り切れになりました。カートに戻って外してください。</p></div>`:null}
+    <div class="card"><h3>受け取り日（当日のみ）</h3>
+      ${days.length?html`<div class="times" role="group" aria-label="受け取り日" style=${{gridTemplateColumns:"repeat(3,1fr)",marginBottom:"14px"}}>${days.map(d=>html`<button type="button" key=${d.key} aria-pressed=${day&&day.key===d.key} onClick=${()=>{setDay(d);setTime(d.times[0]);}}>${d.label}</button>`)}</div>
+      <h3>受け取り時間</h3>
+      <div class="times" role="group" aria-label="受け取り時間">${day.times.map(t=>html`<button type="button" key=${t} aria-pressed=${time===t} onClick=${()=>setTime(t)}>${t}</button>`)}</div>`
+      :html`<p style=${{margin:0}}>${shopStatus(STATE,new Date()).msg}。またのご利用をお待ちしています。</p>`}
+      <p class="demo" style=${{textAlign:"left",marginTop:"10px"}}>テイクアウトは当日受け取りのみ／受付 ${STATE.open}〜${STATE.last}／定休日 火曜日</p></div>
+    <div class="card">
+      <div class="field"><label for="nm">お名前</label><input id="nm" value=${name} onInput=${e=>setName(e.target.value)} placeholder="例：山田" autocomplete="name"/></div>
+      <div class="field" style=${{marginBottom:0}}><label for="nt">ご要望（なくても大丈夫）</label><textarea id="nt" rows="2" value=${note} onInput=${e=>setNote(e.target.value)} placeholder="例：辛さひかえめで"></textarea></div>
+    </div>
+    <div class="card"><h3>お支払い</h3><p style=${{margin:0,fontSize:"14px"}}>受け取りのときに、店頭でお支払いください（現金・クレジットカード・QR決済）。</p></div>
+    <div class="card" style=${{background:"#fff"}}><h3>注文のしかた</h3><p style=${{margin:0,fontSize:"14px"}}>下のボタンを押すと、お店のLINEが開いて注文内容が入ります。<b>そのまま送信すると注文完了</b>です。お店から確認のお返事をします。</p></div>
+    ${ready?html`<a class="primary" style=${{display:"block",textAlign:"center",textDecoration:"none",background:"#06C755"}} href=${lineUrl(order)} target="_blank" rel="noopener" onClick=${()=>setTimeout(()=>onDone(order),300)}>LINEで注文を送る</a>`
+      :html`<button class="primary" type="button" disabled>${bad.length?"売り切れの商品を外してください":!day?"いまは受付時間外です":name.trim()?"受け取り時間を選んでください":"お名前を入れてください"}</button>`}
+    <p class="demo">LINEの友だち追加がまだの方は、先に追加をお願いします（LINE ID：${LINE_ID}）。</p>
+  </div></div>`;
+}
+
+function Done({order,onHome}){
+  return html`<div class="page" role="dialog" aria-modal="true" aria-label="注文の送信"><div class="page-in done">
+    <div class="check"><svg viewBox="0 0 52 52" fill="none"><path d="M14 27l8 8 16-18" stroke="#FFE45C" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <h2>THANK YOU<span>LINEで送信すると、注文完了です</span></h2>
+    <div class="ticket"><div class="no">${order.no}</div><div class="when">${order.time} にお受け取り ／ ${order.name} 様</div>
+      <ul>${order.lines.map(l=>html`<li key=${l.key}><span>${l.name} × ${l.qty}<br/><small style=${{color:"var(--muted)"}}>${l.detail}</small></span><span>${yen(l.unit*l.qty)}円</span></li>`)}
+      <li><b>合計（税込）</b><b>${yen(order.total)}円</b></li></ul>
+      ${order.note?html`<p style=${{fontSize:"13px",margin:"10px 0 0"}}>ご要望：${order.note}</p>`:null}</div>
+    <p style=${{margin:0,fontSize:"14px"}}>お店から確認のお返事が届いたら、注文は受け付けられています。<br/>LINEが開かなかったときは、下のボタンからもう一度送ってください。</p>
+    <a class="primary" style=${{display:"block",textAlign:"center",textDecoration:"none",background:"#06C755"}} href=${lineUrl(order)} target="_blank" rel="noopener">もう一度LINEを開く</a>
+    <button class="secondary" onClick=${onHome}>メニューに戻る</button>
+    <p style=${{margin:0,fontSize:"13px"}}>受け取り：宮崎県都城市牟田町18-2 ボーンクラッシュビル2F</p>
+  </div></div>`;
+}
+
+const HOURS=[];for(let m=10*60;m<=21*60;m+=15)HOURS.push(fmtT(m));
+function Kitchen(){
+  const [st,setSt]=useState(()=>({...STATE,soldOut:[...soldSet(STATE)]}));
+  const [msg,setMsg]=useState("");const [busy,setBusy]=useState(false);const [out,setOut]=useState("");
+  const live=shopStatus(STATE,new Date());
+  const so=new Set(st.soldOut);
+  const flip=id=>setSt(x=>({...x,soldOut:so.has(id)?x.soldOut.filter(k=>k!==id):[...x.soldOut,id]}));
+  const dirty=JSON.stringify({...st,soldDate:"",specialOpen:""})!==JSON.stringify({...STATE,soldOut:[...soldSet(STATE)],soldDate:"",specialOpen:""});
+  const save=async next=>{
+    const json=JSON.stringify({...next,soldDate:todayKey()});
+    let copied=false;
+    try{await navigator.clipboard.writeText(json);copied=true;}catch(e){}
+    window.open(EDIT_URL,"_blank","noopener");
+    setMsg(copied?"内容をコピーしました。開いたギットハブの画面で、中身を全部消して貼りつけ、緑のボタンを押してください。1〜2分でお客さんの画面に出ます。":"下の文字を全部コピーして、開いたギットハブの画面で中身を全部消して貼りつけ、緑のボタンを押してください。");
+    setOut(json);
+  };
+  const chip=(id,label)=>html`<button key=${id} type="button" class=${"kchip"+(so.has(id)?" on":"")} aria-pressed=${so.has(id)} onClick=${()=>flip(id)}>${label}<small>${so.has(id)?"売り切れ":"販売中"}</small></button>`;
+  return html`<div class="kitchen"><div class="k-in">
+    <header class="k-head"><div><span class="k-en">KITCHEN</span><h1>厨房用 管理画面</h1></div><a href="#" class="k-link">お客さんの画面を見る →</a></header>
+    <section class=${"k-status k-"+live.kind}><div><small>いまのお客さんの画面</small><b>${live.kind==="open"?"受付中":live.kind==="stop"?"受付停止中":"受付時間外"}</b><span>${live.msg}</span></div>
+      <button type="button" class="k-big" disabled=${busy} onClick=${()=>save({...st,accepting:!STATE.accepting})}>${STATE.accepting?"受付を止める":"受付を始める"}</button></section>
+    ${(!isOpen(new Date())||STATE.specialOpen===todayKey())?html`<section class="k-card k-special"><h2>今日は${isOpen(new Date())?"":"定休日・お休みの日です"}<span>${STATE.specialOpen===todayKey()?"いまは臨時営業にしています。お客さんは注文できます":"臨時営業にすると、今日だけ受付時間内の注文を受けられます"}</span></h2>
+      <button type="button" class="k-big" disabled=${busy} onClick=${()=>save({...st,specialOpen:STATE.specialOpen===todayKey()?"":todayKey()})}>${STATE.specialOpen===todayKey()?"臨時営業をやめる":"今日は臨時営業する"}</button></section>`:null}
+    <section class="k-card"><h2>受付時間（当日受け取りのみ）</h2>
+      <div class="k-row"><label for="k-open">受付開始<select id="k-open" value=${st.open} onChange=${e=>setSt(x=>({...x,open:e.target.value}))}>${HOURS.map(h=>html`<option key=${h} value=${h}>${h}</option>`)}</select></label>
+      <label for="k-last">最終受付<select id="k-last" value=${st.last} onChange=${e=>setSt(x=>({...x,last:e.target.value}))}>${HOURS.map(h=>html`<option key=${h} value=${h}>${h}</option>`)}</select></label></div>
+      <p class="k-note">受け取り時間は、注文から30分後〜最終受付の15分後まで選べます。定休日（火曜）と休業日は自動で受付時間外になります。</p>
+      <label for="k-notice" class="k-full">お知らせ（お客さんの画面の上に出ます）<input id="k-notice" value=${st.notice} maxLength="80" placeholder="例：本日は13時で受付終了です" onInput=${e=>setSt(x=>({...x,notice:e.target.value}))}/></label></section>
+    <section class="k-card"><h2>売り切れ<span>押すと切りかわります。今日だけ有効で、次の日には自動でもどります</span></h2>
+      <h3>チキン</h3><div class="k-grid">${chip("chicken","チキン全部")}${FLAVORS.map(f=>chip("f:"+f.id,f.name))}</div>
+      <h3>メニュー</h3><div class="k-grid">${SIMPLE.map(it=>chip(it.id,it.name))}</div>
+      <button type="button" class="k-clear" onClick=${()=>setSt(x=>({...x,soldOut:[]}))}>売り切れを全部もどす</button></section>
+    <div class="k-save"><button type="button" class="primary" disabled=${busy||!dirty} onClick=${()=>save(st)}>${dirty?"お客さんの画面に反映する":"変更はありません"}</button>
+      <p role="status">${msg||"押すと、変更した内容をコピーして、ギットハブの保存画面を開きます。"}</p>${out?html`<textarea class="k-out" readonly value=${out} onFocus=${e=>e.target.select()}></textarea>`:null}</div>
+  </div></div>`;
+}
+
+function App({initial}){
+  const [cart,setCart]=useLS("lab-cart",initial.cart||[]);
+  const [view,setView]=useState("menu");
+  const [order,setOrder]=useState(null);
+  const [toast,setToast]=useState(null);
+  const [active,setActive]=useState("chicken");
+  const [bump,setBump]=useState(0);
+  const [hash,setHash]=useState(location.hash);
+  const [tick,setTick]=useState(0);
+  useEffect(()=>{const h=()=>setHash(location.hash);addEventListener("hashchange",h);const t=setInterval(()=>setTick(x=>x+1),60000);return()=>{removeEventListener("hashchange",h);clearInterval(t)}},[]);
+  const so=soldSet(STATE);const status=shopStatus(STATE,new Date());const closed=!status.open;
+  useEffect(()=>{window.claude?.hot?.snapshot?.(()=>({cart}))},[cart]);
+  const count=cart.reduce((a,l)=>a+l.qty,0);
+  const total=cart.reduce((a,l)=>a+l.unit*l.qty,0);
+  const add=item=>{
+    setCart(c=>{const i=c.findIndex(l=>l.key===item.key);if(i>=0){const n=[...c];n[i]={...n[i],qty:n[i].qty+item.qty};return n;}return [...c,item];});
+    setToast({t:`${item.name}をカートに入れました`,k:Date.now()});setBump(b=>b+1);
+  };
+  const setQty=(key,q)=>setCart(c=>q<=0?c.filter(l=>l.key!==key):c.map(l=>l.key===key?{...l,qty:Math.min(20,q)}:l));
+  useEffect(()=>{if(!toast)return;const t=setTimeout(()=>setToast(null),1900);return()=>clearTimeout(t)},[toast]);
+  useEffect(()=>{
+    if(!("IntersectionObserver" in window))return;
+    const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)setActive(e.target.id)}),{rootMargin:"-45% 0px -50% 0px"});
+    document.querySelectorAll("section.cat").forEach(s=>io.observe(s));return()=>io.disconnect();
+  },[]);
+  const go=id=>{const el=document.getElementById(id);el&&el.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"});};
+  const navs=[["chicken","チキン"],["burger","バーガー"],["karaage","唐揚げ"],["chumoppa","チュモッパ"],["side","サイド"],["drink","ドリンク"]];
+  if(hash==="#kitchen") return html`<${Kitchen}/>`;
+  return html`<div>
+    <${Hero} onStart=${()=>go("chicken")}/>
+    <div class="info"><div><span><b>テイクアウト受付</b>${STATE.open}〜${STATE.last}（当日受け取りのみ）</span><span><b>定休日</b>火曜日</span><span><b>受け取り</b>都城市牟田町18-2 ボーンクラッシュビル2F</span></div></div>
+    ${closed?html`<div class=${"banner b-"+status.kind} role="status"><b>${status.kind==="stop"?"受付停止中":"受付時間外"}</b>${status.msg}。メニューはご覧いただけます。</div>`:html`<div class="banner b-open" role="status"><b>受付中</b>本日 ${STATE.last} までのご注文を、当日お受け取りいただけます。</div>`}
+    ${STATE.notice?html`<div class="banner b-notice">${STATE.notice}</div>`:null}
+    <nav class="nav" aria-label="メニューの種類"><div class="nav-in">
+      ${navs.map(([id,l])=>html`<a key=${id} href=${"#"+id} class=${active===id?"on":""} onClick=${e=>{e.preventDefault();go(id);}}>${l}</a>`)}
+      <button class="cartbtn" onClick=${()=>setView("cart")}>カート <span>${count}</span></button>
+    </div></nav>
+    <main>
+      <div class="pr"><span class="tag">NEW</span><p><b>チキンバーガー</b>　ポテト付き900円。店内・テイクアウトどちらも。</p><button onClick=${()=>{go("burger");}}>見てみる</button></div>
+      <section class="cat" id="chicken"><${SecHead} en="CHICKEN" ja="チキン"/><${ChickenBuilder} onAdd=${add} so=${so} closed=${closed}/></section>
+      <section class="cat" id="burger"><${SecHead} en="BURGER" ja="チキンバーガー"/><div class="items">${SIMPLE.filter(i=>i.cat==="burger").map(it=>html`<${SimpleItem} key=${it.id} it=${it} onAdd=${add} so=${so} closed=${closed}/>`)}</div></section>
+      <section class="cat" id="karaage"><${SecHead} en="KARAAGE" ja="唐揚げ"/><div class="items">${SIMPLE.filter(i=>i.cat==="karaage").map(it=>html`<${SimpleItem} key=${it.id} it=${it} onAdd=${add} so=${so} closed=${closed}/>`)}</div></section>
+      <section class="cat" id="chumoppa"><${SecHead} en="CHUMOPPA" ja="チュモッパ"/><div class="items">${SIMPLE.filter(i=>i.cat==="chumoppa").map(it=>html`<${SimpleItem} key=${it.id} it=${it} onAdd=${add} so=${so} closed=${closed}/>`)}</div></section>
+      <section class="cat" id="side"><${SecHead} en="SIDE" ja="サイドメニュー"/><div class="items">${SIMPLE.filter(i=>i.cat==="side").map(it=>html`<${SimpleItem} key=${it.id} it=${it} onAdd=${add} so=${so} closed=${closed}/>`)}</div></section>
+      <section class="cat" id="drink"><${SecHead} en="DRINK" ja="ドリンク"/><div class="items">${SIMPLE.filter(i=>i.cat==="drink").map(it=>html`<${SimpleItem} key=${it.id} it=${it} onAdd=${add} so=${so} closed=${closed}/>`)}</div></section>
+    </main>
+    <footer class="site"><div><b>ヤンニョムチキン研究所 都城LAB</b><span>宮崎県都城市牟田町18-2 ボーンクラッシュビル2F</span><span>営業 11:00〜15:00 ／ 定休日 火曜日 ／ 価格はすべて税込</span><span>Instagram @y.chickenlab ／ LINE @401pisua</span><span>ご注文はLINEで受け付けています。お支払いは受け取りのときに店頭で。</span></div></footer>
+    <button class=${"cartbar"+(count&&view==="menu"?"":" hide")} onClick=${()=>setView("cart")} aria-label="カートを見る">
+      <span key=${bump} class="badge bump">${count}</span><span class="t"><small>カートを見る</small><b>${yen(total)}円</b></span><span class="go">注文へ</span></button>
+    ${view==="cart"?html`<${Cart} cart=${cart} setQty=${setQty} onClose=${()=>setView("menu")} onCheckout=${()=>setView("checkout")}/>`:null}
+    ${view==="checkout"?html`<${Checkout} cart=${cart} so=${so} onBack=${()=>setView("cart")} onDone=${o=>{setOrder(o);setCart([]);setView("done");}}/>`:null}
+    ${view==="done"&&order?html`<${Done} order=${order} onHome=${()=>{setView("menu");window.scrollTo(0,0);}}/>`:null}
+    ${toast?html`<div class="toast" key=${toast.k} role="status">${toast.t}</div>`:null}
+  </div>`;
+}
+
+const start=data=>ReactDOM.createRoot(document.getElementById("root")).render(html`<${App} initial=${data||{}}/>`);
+fetch("state.json?t="+Date.now(),{cache:"no-store"}).then(r=>r.ok?r.json():null).then(j=>{if(j)STATE={...STATE,...j};}).catch(()=>{}).finally(()=>start({}));
+</script>
+</body>
+</html>
