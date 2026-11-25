@@ -295,7 +295,8 @@ let STATE={accepting:true,open:"11:00",last:"14:30",soldOut:[],soldDate:"",notic
 try{STATE={...STATE,...JSON.parse(document.getElementById("shop-state").textContent)}}catch(e){}
 const toMin=t=>{const [h,m]=String(t).split(":").map(Number);return h*60+(m||0)};
 const todayKey=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`};
-const EDIT_URL="https://github.com/ychickenlab-ai/ychickenlab-ai.github.io/edit/main/order/state.json";
+const API="https://script.google.com/macros/s/AKfycbwZpG4sbp3TfuBpb7LYVwLeBMk5puctATrLAI3Lm33DZZeow4D0KPOA52L_P5Dm_Dl5/exec";
+const loadState=()=>fetch(API,{cache:"no-store"}).then(r=>r.json()).then(j=>{if(j&&typeof j==="object"&&"accepting" in j){STATE={...STATE,...j};return true;}throw 0;}).catch(()=>fetch("state.json?t="+Date.now(),{cache:"no-store"}).then(r=>r.ok?r.json():null).then(j=>{if(j)STATE={...STATE,...j};}).catch(()=>{}));
 function shopStatus(st,now){
   if(!st.accepting) return {open:false,kind:"stop",msg:"ただいまテイクアウトの受付を止めています"};
   if(!isOpen(now)&&st.specialOpen!==todayKey()) return {open:false,kind:"off",msg:now.getDay()===2?"本日は定休日です（火曜日）":"本日はお休みをいただいています"};
@@ -587,18 +588,26 @@ function Done({order,onHome}){
 const HOURS=[];for(let m=10*60;m<=21*60;m+=15)HOURS.push(fmtT(m));
 function Kitchen(){
   const [st,setSt]=useState(()=>({...STATE,soldOut:[...soldSet(STATE)]}));
-  const [msg,setMsg]=useState("");const [busy,setBusy]=useState(false);const [out,setOut]=useState("");
+  const [msg,setMsg]=useState("");const [busy,setBusy]=useState(false);
   const live=shopStatus(STATE,new Date());
   const so=new Set(st.soldOut);
   const flip=id=>setSt(x=>({...x,soldOut:so.has(id)?x.soldOut.filter(k=>k!==id):[...x.soldOut,id]}));
   const dirty=JSON.stringify({...st,soldDate:"",specialOpen:""})!==JSON.stringify({...STATE,soldOut:[...soldSet(STATE)],soldDate:"",specialOpen:""});
   const save=async next=>{
-    const json=JSON.stringify({...next,soldDate:todayKey()});
-    let copied=false;
-    try{await navigator.clipboard.writeText(json);copied=true;}catch(e){}
-    window.open(EDIT_URL,"_blank","noopener");
-    setMsg(copied?"内容をコピーしました。開いたギットハブの画面で、中身を全部消して貼りつけ、緑のボタンを押してください。1〜2分でお客さんの画面に出ます。":"下の文字を全部コピーして、開いたギットハブの画面で中身を全部消して貼りつけ、緑のボタンを押してください。");
-    setOut(json);
+    let pin="";try{pin=localStorage.getItem("kitchen-pin")||"";}catch(e){}
+    if(!pin){pin=(window.prompt("暗証番号（4けた）を入れてください")||"").trim();if(!pin)return;}
+    setBusy(true);setMsg("保存しています…");
+    try{
+      const nextState={...next,soldDate:todayKey()};
+      const r=await fetch(API,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({pin,state:nextState})});
+      const j=await r.json();
+      if(!j.ok){try{localStorage.removeItem("kitchen-pin");}catch(e){}setMsg(j.error==="pin"?"暗証番号がちがいます。もう一度押して、入れなおしてください。":"保存できませんでした。もう一度ためしてください。");setBusy(false);return;}
+      try{localStorage.setItem("kitchen-pin",pin);}catch(e){}
+      STATE={...STATE,...nextState};
+      setSt({...STATE,soldOut:[...soldSet(STATE)]});
+      setMsg("保存しました。お客さんの画面にも出ます。");
+    }catch(e){setMsg("保存できませんでした。ネットにつながっているか確かめて、もう一度ためしてください。");}
+    setBusy(false);
   };
   const chip=(id,label)=>html`<button key=${id} type="button" class=${"kchip"+(so.has(id)?" on":"")} aria-pressed=${so.has(id)} onClick=${()=>flip(id)}>${label}<small>${so.has(id)?"売り切れ":"販売中"}</small></button>`;
   return html`<div class="kitchen"><div class="k-in">
@@ -617,7 +626,7 @@ function Kitchen(){
       <h3>メニュー</h3><div class="k-grid">${SIMPLE.map(it=>chip(it.id,it.name))}</div>
       <button type="button" class="k-clear" onClick=${()=>setSt(x=>({...x,soldOut:[]}))}>売り切れを全部もどす</button></section>
     <div class="k-save"><button type="button" class="primary" disabled=${busy||!dirty} onClick=${()=>save(st)}>${dirty?"お客さんの画面に反映する":"変更はありません"}</button>
-      <p role="status">${msg||"押すと、変更した内容をコピーして、ギットハブの保存画面を開きます。"}</p>${out?html`<textarea class="k-out" readonly value=${out} onFocus=${e=>e.target.select()}></textarea>`:null}</div>
+      <p role="status">${msg||"押すと、その場で保存されて、お客さんの画面にも出ます。"}</p></div>
   </div></div>`;
 }
 
@@ -630,7 +639,7 @@ function App({initial}){
   const [bump,setBump]=useState(0);
   const [hash,setHash]=useState(location.hash);
   const [tick,setTick]=useState(0);
-  useEffect(()=>{const h=()=>setHash(location.hash);addEventListener("hashchange",h);const t=setInterval(()=>setTick(x=>x+1),60000);return()=>{removeEventListener("hashchange",h);clearInterval(t)}},[]);
+  useEffect(()=>{const h=()=>setHash(location.hash);addEventListener("hashchange",h);const t=setInterval(()=>{if(location.hash==="#kitchen"){setTick(x=>x+1);return;}loadState().finally(()=>setTick(x=>x+1));},60000);return()=>{removeEventListener("hashchange",h);clearInterval(t)}},[]);
   const so=soldSet(STATE);const status=shopStatus(STATE,new Date());const closed=!status.open;
   useEffect(()=>{window.claude?.hot?.snapshot?.(()=>({cart}))},[cart]);
   const count=cart.reduce((a,l)=>a+l.qty,0);
@@ -678,7 +687,7 @@ function App({initial}){
 }
 
 const start=data=>ReactDOM.createRoot(document.getElementById("root")).render(html`<${App} initial=${data||{}}/>`);
-fetch("state.json?t="+Date.now(),{cache:"no-store"}).then(r=>r.ok?r.json():null).then(j=>{if(j)STATE={...STATE,...j};}).catch(()=>{}).finally(()=>start({}));
+loadState().finally(()=>start({}));
 </script>
 </body>
 </html>
